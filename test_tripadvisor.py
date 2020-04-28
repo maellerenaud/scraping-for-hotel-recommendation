@@ -27,7 +27,15 @@ class TestSelenium(unittest.TestCase):
     def test_visit_hotels_one_page(self):
         browser = setup_browser(r"/home/peach/PycharmProjects/scraping/chromedriver")
         request(browser, 'Rennes', '2020-5-27', '2020-5-28')
-        visit_hotels_one_page(browser)
+        self.assertEqual(visit_hotels_one_page(browser), 11)
+
+    def test_visit_hotels_all_pages(self):
+        browser = setup_browser(r"/home/peach/PycharmProjects/scraping/chromedriver")
+        request(browser, 'Rennes', '2020-5-27', '2020-5-28')
+        self.assertEqual(visit_hotels_all_pages(browser), 11)
+        browser = setup_browser(r"/home/peach/PycharmProjects/scraping/chromedriver")
+        request(browser, 'Toulouse', '2020-5-25', '2020-5-26')
+        self.assertEqual(visit_hotels_all_pages(browser), 61)
 
 
 class TestGetCharacteristics(unittest.TestCase):

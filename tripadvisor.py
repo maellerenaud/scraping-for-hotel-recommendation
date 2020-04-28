@@ -184,26 +184,35 @@ def get_all_characteristics(browser):
 def visit_hotels_one_page(browser):
     wait = WebDriverWait(browser, 10)
     available_hotels = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@id="taplc_hsx_hotel_list_lite_dusty_hotels_combined_sponsored_0"]')))
+    time.sleep(1)
     list_hotels = available_hotels.find_elements_by_xpath('.//a[@data-clicksource="HotelName"]')
-    print(len(list_hotels))
-    for i in range(len(list_hotels)):
+    nb_hotels = len(list_hotels)
+    for i in range(nb_hotels):
         wait = WebDriverWait(browser, 10)
         list_hotels = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//a[@data-clicksource="HotelName"]')))
         hotel = list_hotels[i]
         browser.get(hotel.get_attribute('href'))
         print(get_all_characteristics(browser))
         browser.back()
+    return nb_hotels
 
 def visit_hotels_all_pages(browser):
-    visit_hotels_one_page(browser)
+    nb_hotels_visited = visit_hotels_one_page(browser)
+    wait = WebDriverWait(browser, 10)
+    list_hotels = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//a[@data-clicksource="HotelName"]')))
+    nb_hotels_on_page = len(list_hotels)
+    total_nb_hotels_visited = nb_hotels_visited
     i = 2
-    while True:
+    while nb_hotels_visited == nb_hotels_on_page:
         try:
             next_page = browser.find_element_by_xpath('//div[@class="pageNumbers"]/a[{}]'.format(str(i),)).get_attribute('href')
             browser.get(next_page)
-            time.sleep(2)
-            visit_hotels_one_page(browser)
+            nb_hotels_visited = visit_hotels_one_page(browser)
+            wait = WebDriverWait(browser, 10)
+            nb_hotels_on_page = len(wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//a[@data-clicksource="HotelName"]'))))
+            total_nb_hotels_visited += nb_hotels_visited
             i += 1
         except:
             break
+    return total_nb_hotels_visited
 
