@@ -77,15 +77,27 @@ def request(browser, town, arrival_date, departure_date):
     search_button.click()
     time.sleep(1)
 
-### Get charateristics of one hotel and save them
+### Get charateristics of one hotel
+
+def get_name(browser):
+    wait = WebDriverWait(browser, 3)
+    name = wait.until(ec.presence_of_element_located((By.XPATH, '//h1[@id="HEADING"]')))
+    return name.text
 
 def get_price(browser):
-    best_offer = browser.find_element_by_xpath('//div[@class="hotels-hotel-offers-DominantOffer__price--D-ycN"]')
+    try:
+        wait = WebDriverWait(browser, 3)
+        offers = wait.until(ec.visibility_of_any_elements_located((By.XPATH, '//div[@class="hotels-hotel-offers-DetailChevronOffer__price--py2LH"]')))
+        best_offer = offers[0]
+    except:
+        wait = WebDriverWait(browser, 10)
+        best_offer = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@class="hotels-hotel-offers-DominantOffer__price--D-ycN"]')))
     price = int(best_offer.text[:-1])
     return price
 
 def get_grade(browser):
-    votes = browser.find_elements_by_xpath('//ul[@class="location-review-review-list-parts-ReviewFilter__filter_table--1H9KD"]/li/span[2]')
+    wait = WebDriverWait(browser, 10)
+    votes = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//ul[@class="location-review-review-list-parts-ReviewFilter__filter_table--1H9KD"]/li/span[2]')))
     grade_votes = {}
     grade = 5
     for element in votes:
@@ -95,27 +107,32 @@ def get_grade(browser):
     average =  (grade_votes[1] + grade_votes[2]*2 + grade_votes[3]*3 + grade_votes[4]*4 + grade_votes[5]*5) / (nb_votes*5)
     return average, nb_votes
 
-def get_localisation(browser):
-    indice = browser.find_element_by_xpath('//div[@id="LOCATION"]/div[2]/div[1]/span[1]').text
-    return int(indice)
+def get_address(browser):
+    wait = WebDriverWait(browser, 10)
+    address = wait.until(ec.presence_of_element_located((By.XPATH, '//div[@class="public-business-listing-ContactInfo__offer--KAFI4 public-business-listing-ContactInfo__location--1jP2j"]/span[2]')))
+    return address.text
 
 def get_services_on_services_page(browser):
     wifi, clim, minibar = False, False, False
-    services = browser.find_elements_by_xpath('//div[@class="hotels-hr-about-amenities-AmenitiesModal__group--3nudN"]/div')
+    wait = WebDriverWait(browser, 3)
+    services = wait.until(ec.presence_of_all_elements_located((By.XPATH, '//div[@class="hotels-hr-about-amenities-AmenitiesModal__group--3nudN"]/div')))
     for service in services:
         wifi = wifi or service.text == 'Wi-Fi'
         clim = clim or service.text == 'Climatisation'
         minibar = minibar or service.text == 'Minibar'
-    quit = browser.find_element_by_xpath('//div[@class="_2EFRp_bb _3IWKziRc _3ptEwvMl"][@role="button"]')
+    wait = WebDriverWait(browser, 3)
+    quit = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@class="_2EFRp_bb _3IWKziRc _3ptEwvMl"][@role="button"]')))
     quit.click()
     return wifi, clim, minibar
 
 def get_services_on_hotel_page(browser, room_services):
     wifi, clim, minibar = False, False, False
     if room_services:
-        services = browser.find_elements_by_xpath('//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[@class="hotels-hr-about-amenities-AmenityGroup__amenitiesList--3MdFn"][2]/div')
+        wait = WebDriverWait(browser, 3)
+        services = wait.until(ec.presence_of_all_elements_located((By.XPATH, '//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[@class="hotels-hr-about-amenities-AmenityGroup__amenitiesList--3MdFn"][2]/div')))
     else:
-        services = browser.find_elements_by_xpath('//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[@class="hotels-hr-about-amenities-AmenityGroup__amenitiesList--3MdFn"][1]/div')
+        wait = WebDriverWait(browser, 3)
+        services = wait.until(ec.presence_of_all_elements_located((By.XPATH, '//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[@class="hotels-hr-about-amenities-AmenityGroup__amenitiesList--3MdFn"][1]/div')))
     for service in services:
         wifi = wifi or service.text == 'Wi-Fi'
         clim = clim or service.text == 'Climatisation'
@@ -126,7 +143,8 @@ def get_services(browser):
     wifi, clim, minibar = False, False, False
     # Get hotel services
     try:
-        plus = browser.find_element_by_xpath('//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[3]')
+        wait = WebDriverWait(browser, 3)
+        plus = wait.until(ec.presence_of_element_located((By.XPATH, '//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[3]')))
         plus.click()
         time.sleep(1)
         wifi1, clim1, minibar1 = get_services_on_services_page(browser)
@@ -139,7 +157,8 @@ def get_services(browser):
             pass
     # Get room services
     try:
-        plus = browser.find_element_by_xpath('//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[6]')
+        wait = WebDriverWait(browser, 3)
+        plus = wait.until(ec.presence_of_element_located((By.XPATH, '//div[@id="ABOUT_TAB"]/div[1]/div[2]/div[1]/div[6]')))
         plus.click()
         time.sleep(1)
         wifi3, clim3, minibar3 = get_services_on_services_page(browser)
@@ -152,4 +171,39 @@ def get_services(browser):
             pass
     return wifi, clim, minibar
 
+def get_all_characteristics(browser):
+    name = get_name(browser)
+    price = get_price(browser)
+    grade, nb_votes = get_grade(browser)
+    address = get_address(browser)
+    wifi, clim, minibar = get_services(browser)
+    return name, price, grade, nb_votes, address, wifi, clim, minibar
+
+### Visit all hotels pages
+
+def visit_hotels_one_page(browser):
+    wait = WebDriverWait(browser, 10)
+    available_hotels = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@id="taplc_hsx_hotel_list_lite_dusty_hotels_combined_sponsored_0"]')))
+    list_hotels = available_hotels.find_elements_by_xpath('.//a[@data-clicksource="HotelName"]')
+    print(len(list_hotels))
+    for i in range(len(list_hotels)):
+        wait = WebDriverWait(browser, 10)
+        list_hotels = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//a[@data-clicksource="HotelName"]')))
+        hotel = list_hotels[i]
+        browser.get(hotel.get_attribute('href'))
+        print(get_all_characteristics(browser))
+        browser.back()
+
+def visit_hotels_all_pages(browser):
+    visit_hotels_one_page(browser)
+    i = 2
+    while True:
+        try:
+            next_page = browser.find_element_by_xpath('//div[@class="pageNumbers"]/a[{}]'.format(str(i),)).get_attribute('href')
+            browser.get(next_page)
+            time.sleep(2)
+            visit_hotels_one_page(browser)
+            i += 1
+        except:
+            break
 
