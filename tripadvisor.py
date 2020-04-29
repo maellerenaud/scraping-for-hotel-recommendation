@@ -37,7 +37,8 @@ def month_difference(date1, date2):
 
 def chose_date(browser, date):
     adapted_date = adapt_dates_to_tripadvisor(date)
-    button_date = browser.find_element_by_xpath('//span[@data-date="{}"]'.format(adapted_date,))
+    wait = WebDriverWait(browser, 10)
+    button_date = wait.until(ec.visibility_of_element_located((By.XPATH, '//span[@data-date="{}"]'.format(adapted_date,))))
     button_date.click()
 
 def chose_both_dates(browser, search_bar, arrival_date, departure_date):
@@ -46,7 +47,9 @@ def chose_both_dates(browser, search_bar, arrival_date, departure_date):
     time.sleep(1)
     today = str(date.today())
     for i in range(month_difference(today, arrival_date)):
-        browser.find_element_by_xpath('//div[@class="rsdc-next rsdc-nav ui_icon single-chevron-right-circle"]').click()
+        wait = WebDriverWait(browser, 10)
+        next_month = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@class="rsdc-next rsdc-nav ui_icon single-chevron-right-circle"]')))
+        next_month.click()
         time.sleep(1)
     chose_date(browser, arrival_date)
     chose_date(browser, departure_date)     # No need to change month, we can reserve only for 30 days maximum
@@ -54,28 +57,26 @@ def chose_both_dates(browser, search_bar, arrival_date, departure_date):
 def chose_guests(browser, search_bar):
     open_guests_choice = search_bar.find_element_by_xpath('//div[@data-prwidget-name="ibex_trip_search_rooms_guests"]')
     open_guests_choice.click()
-    button_add_child = browser.find_element_by_xpath('//div[@class="childrenPlaceholder"]/div[1]/span[1]/span[@class="ui_icon plus-circle"]')
+    wait = WebDriverWait(browser, 10)
+    button_add_child = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@class="childrenPlaceholder"]/div[1]/span[1]/span[@class="ui_icon plus-circle"]')))
     button_add_child.click()
-    time.sleep(0.5)
     button_add_child.click()
-    time.sleep(0.5)
-    children_ages_wrap = browser.find_element_by_xpath('//div[@class="ages-wrap"]')
+    children_ages_wrap = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@class="ages-wrap"]')))
     for i in range(1,3):
         open_child_age_choices = children_ages_wrap.find_element_by_xpath('./span[{}]/span[1]/span[2]'.format(str(i)))
         open_child_age_choices.click()
         children_ages_wrap.find_element_by_xpath('./span[{}]/span[1]/div[1]/span[1]/ul[2]/li[@data-val="10"]'.format(str(i))).click()
-        time.sleep(0.5)
+        time.sleep(1)
 
 def request(browser, town, arrival_date, departure_date):
     browser.get('https://www.tripadvisor.fr/Hotels')
-    time.sleep(1)
-    search_bar = browser.find_element_by_xpath('//div[@id="taplc_trip_search_home_hotels_0"]/div[2]')
+    wait = WebDriverWait(browser, 3)
+    search_bar = wait.until(ec.presence_of_element_located((By.XPATH, '//div[@id="taplc_trip_search_home_hotels_0"]/div[2]')))
     chose_town(search_bar, town)
     chose_both_dates(browser, search_bar, arrival_date, departure_date)
     chose_guests(browser, search_bar)
     search_button = browser.find_element_by_xpath('//button[@id="SUBMIT_HOTELS"]')
     search_button.click()
-    time.sleep(1)
 
 ### Get charateristics of one hotel
 
