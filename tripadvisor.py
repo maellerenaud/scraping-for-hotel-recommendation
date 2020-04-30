@@ -1,22 +1,10 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 import time
 from datetime import date
-import os
 
-### Set up browser
-
-def setup_browser(path_chromedriver):
-    option = webdriver.ChromeOptions()
-    option.add_argument("--incognito")
-    option.add_argument("--start-maximised") #"kiosk" sur mac
-    prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096 }
-    option.add_experimental_option('prefs', prefs)
-    #browser = webdriver.Chrome(executable_path=str(os.getcwd())+"\chromedriver", options=option) #!!! Executable à télécharger et path à changer
-    browser = webdriver.Chrome(executable_path=path_chromedriver, options=option)
-    return browser
+from utils import *
 
 ### Connect to tripadvisor and make request
 
