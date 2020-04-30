@@ -4,6 +4,11 @@ from utils import *
 
 class TestUtilsForDatbase(unittest.TestCase):
 
+    def test_convert_string_to_file_name(self):
+        self.assertEqual(convert_string_to_file_name('Rennes'), 'rennes')
+        self.assertEqual(convert_string_to_file_name('Saint-Étienne'), 'saint-étienne')
+        self.assertEqual(convert_string_to_file_name('New York'), 'new-york')
+
     def test_normalize_string(self):
         self.assertEqual(normalize_string('Hotel The Originals Rennes Sud La Chaussairie'), 'hotel the originals rennes sud la chaussairie')
         self.assertEqual(normalize_string('Mandarin Oriental, Paris'), 'mandarin oriental paris')
@@ -57,8 +62,8 @@ class TestUtilsForPoints(unittest.TestCase):
         self.assertEqual(points_clim(True), 10)
         self.assertEqual(points_clim(False), 0)
 
-    def test_ranking_function(self):
-        self.assertEqual(ranking_function(80, 50, 100, 8, 7, 9, 2, 0, 4, True, False, False), 50)
+    def test_ranking_score(self):
+        self.assertEqual(ranking_score(80, 50, 100, 8, 7, 9, 2, 0, 4, True, False, False), 50)
 
 if __name__ == '__main__':
     unittest.main()

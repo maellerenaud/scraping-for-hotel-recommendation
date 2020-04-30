@@ -1,6 +1,5 @@
 import unittest
 
-from utils import *
 from tripadvisor import *
 
 class TestFunctions(unittest.TestCase):

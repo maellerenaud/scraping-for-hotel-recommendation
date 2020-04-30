@@ -17,6 +17,10 @@ def setup_browser(path_chromedriver):
 
 ### Utils to fill database
 
+def convert_string_to_file_name(string):
+    lower_case = string.lower()
+    return lower_case.replace(' ', '-')
+
 def normalize_string(string):
     lower_case = string.lower()
     lower_case = lower_case.replace(' - ', ' ')
@@ -80,7 +84,7 @@ def points_minibar(minibar):
 def points_clim(clim):
     return clim * points_sharing['clim']
 
-def ranking_function(price, price_min, price_max, grade, grade_min, grade_max, distance, distance_min, distance_max, wifi, minibar, clim):
+def ranking_score(price, price_min, price_max, grade, grade_min, grade_max, distance, distance_min, distance_max, wifi, minibar, clim):
     pts_price = points_price(price, price_min, price_max)
     pts_grade = points_grade(grade, grade_min, grade_max)
     pts_distance = points_distance(distance, distance_min, distance_max)
