@@ -59,6 +59,8 @@ class TestGetCharacteristics(unittest.TestCase):
         browser = setup_browser(r"../chromedriver")
         browser.get('https://www.tripadvisor.fr/Hotel_Review-g187103-d2064905-Reviews-Novotel_SPA_Rennes_Centre_Gare-Rennes_Ille_et_Vilaine_Brittany.html')
         self.assertEqual(get_grade(browser), (4717/5745, 1149))
+        browser.get('https://www.tripadvisor.fr/Hotel_Review-g196527-d635507-Reviews-Mainotel-Fougeres_Ille_et_Vilaine_Brittany.html')
+        self.assertEqual(get_grade(browser), None)
 
     def test_get_address(self):
         browser = setup_browser(r"../chromedriver")
@@ -82,7 +84,6 @@ class TestGetCharacteristics(unittest.TestCase):
         time.sleep(2)
         self.assertEqual(get_services_on_hotel_page(browser, True), (False, True, True))
 
-
     def test_get_services(self):
         browser = setup_browser(r"../chromedriver")
         browser.get('https://www.tripadvisor.fr/Hotel_Review-g187103-d2064905-Reviews-Novotel_SPA_Rennes_Centre_Gare-Rennes_Ille_et_Vilaine_Brittany.html')
@@ -101,6 +102,7 @@ class TestGetCharacteristics(unittest.TestCase):
         request(browser, 'Rennes', '2020-5-27', '2020-5-28')
         browser.get('https://www.tripadvisor.fr/Hotel_Review-g187103-d2064905-Reviews-Novotel_SPA_Rennes_Centre_Gare-Rennes_Ille_et_Vilaine_Brittany.html')
         self.assertEqual(get_all_characteristics(browser), ("Novotel SPA Rennes Centre Gare", 176, 4717/5745, 1149, "22 Avenue Jean Janvier, 35000, Rennes France", True, True, True))
+
 
 
 if __name__ == '__main__':

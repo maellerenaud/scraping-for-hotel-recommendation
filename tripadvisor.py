@@ -85,16 +85,19 @@ def get_price(browser):
     return price
 
 def get_grade(browser):
-    wait = WebDriverWait(browser, 10)
-    votes = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//ul[@class="location-review-review-list-parts-ReviewFilter__filter_table--1H9KD"]/li/span[2]')))
-    grade_votes = {}
-    grade = 5
-    for element in votes:
-        grade_votes[grade] = int(element.text)
-        grade -= 1
-    nb_votes = grade_votes[1] + grade_votes[2] + grade_votes[3] + grade_votes[4] + grade_votes[5]
-    average =  (grade_votes[1] + grade_votes[2]*2 + grade_votes[3]*3 + grade_votes[4]*4 + grade_votes[5]*5) / (nb_votes*5)
-    return average, nb_votes
+    try:
+        wait = WebDriverWait(browser, 10)
+        votes = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//ul[@class="location-review-review-list-parts-ReviewFilter__filter_table--1H9KD"]/li/span[2]')))
+        grade_votes = {}
+        grade = 5
+        for element in votes:
+            grade_votes[grade] = int(element.text)
+            grade -= 1
+        nb_votes = grade_votes[1] + grade_votes[2] + grade_votes[3] + grade_votes[4] + grade_votes[5]
+        average =  (grade_votes[1] + grade_votes[2]*2 + grade_votes[3]*3 + grade_votes[4]*4 + grade_votes[5]*5) / (nb_votes*5)
+        return average, nb_votes
+    except:
+        return None
 
 def get_address(browser):
     wait = WebDriverWait(browser, 10)
