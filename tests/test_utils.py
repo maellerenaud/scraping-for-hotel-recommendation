@@ -37,18 +37,23 @@ class TestUtilsForPoints(unittest.TestCase):
     def test_points_price(self):
         self.assertEqual(points_price(35, 0, 100), 21)
         self.assertEqual(points_price(75.99, 0, 100), 9)
+        self.assertEqual(points_price(59.99, 30, 80), 15)
         self.assertEqual(points_price(0, 0, 100), 30)
         self.assertEqual(points_price(100, 0, 100), 3)
+        self.assertEqual(points_price(50, 50, 50), 30)
 
     def test_points_grade(self):
         self.assertEqual(points_grade(0.8756, 0, 1), 17.51)
         self.assertEqual(points_grade(0.8, 0.7, 0.9), 10)
+        self.assertEqual(points_grade(None, 0.7, 0.9), 0)
+        self.assertEqual(points_grade(0.5, 0.5, 0.5), 20)
 
     def test_points_distance(self):
         self.assertEqual(points_distance(46, 0, 100), 10.8)
         self.assertEqual(points_distance(30, 20, 40), 10)
         self.assertEqual(points_distance(20, 20, 40), 20)
         self.assertEqual(points_distance(40, 20, 40), 0)
+        self.assertEqual(points_distance(2, 2, 2), 20)
 
     def test_points_wifi(self):
         self.assertEqual(points_wifi(True), 15)

@@ -57,6 +57,8 @@ def get_distance(town, address):
 points_sharing = {'price': 30, 'grade': 20, 'distance': 20, 'wifi': 15, 'minibar': 5, 'clim': 10}
 
 def points_price(price, price_min, price_max):
+    if price_min == price_max:
+        return points_sharing['price']
     slices = [price_min + (price_max - price_min) * k / 10 for k in range(11)]
     slice_indice = 0
     while slices[slice_indice + 1] < price:
@@ -66,11 +68,17 @@ def points_price(price, price_min, price_max):
 
 def points_grade(grade, grade_min, grade_max):
     '''grade : float between 0 and 1'''
+    if grade is None:
+        return 0
+    if grade_min == grade_max:
+        return points_sharing['grade']
     relative_grade = (grade - grade_min) / (grade_max - grade_min)
     points = points_sharing['grade'] * relative_grade
     return round(points, 2)
 
 def points_distance(distance, distance_min, distance_max):
+    if distance_min == distance_max:
+        return points_sharing['distance']
     relative_distance = (distance - distance_min) / (distance_max - distance_min)
     points = points_sharing['distance'] * (1 - relative_distance)
     return round(points, 2)
