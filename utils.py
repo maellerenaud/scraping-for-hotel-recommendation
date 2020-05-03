@@ -39,10 +39,10 @@ def convert_distance_string_into_float(string):
         return distance / 1000
     return distance
 
-def get_distance(town, address):
+def get_distance(town, hotel_name, address):
     browser = setup_browser(r"./chromedriver")
-    town_url = "{}+office+de+toursime".format(town,)
-    address_url = '+'.join(address.split(' '))
+    town_url = "{}+office+de+tourisme".format(town,)
+    address_url = '+'.join(hotel_name.split(' ')) + '+' + '+'.join(address.split(' '))
     url = "https://www.google.fr/maps/dir/{}/{}/".format(address_url, town_url)
     browser.get(url)
     wait = WebDriverWait(browser, 10)
@@ -97,4 +97,4 @@ def ranking_score(price, price_min, price_max, grade, grade_min, grade_max, dist
     pts_grade = points_grade(grade, grade_min, grade_max)
     pts_distance = points_distance(distance, distance_min, distance_max)
     pts_services = points_wifi(wifi) + points_minibar(minibar) + points_clim(clim)
-    return pts_price + pts_grade + pts_distance + pts_services
+    return round(pts_price + pts_grade + pts_distance + pts_services, 2)

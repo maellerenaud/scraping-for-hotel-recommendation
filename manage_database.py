@@ -41,12 +41,12 @@ def save(conn, hotel_name, comparator, price, grade, nb_votes, address, distance
     conn.commit()
 
 def fill_distances(conn, town):
-    cursor = conn.execute(''' SELECT id, address
+    cursor = conn.execute(''' SELECT id, address, hotelName
                               FROM Results
                               WHERE distance IS NULL''')
     for row in cursor:
-        id, address = row
-        distance = get_distance(town, address)
+        id, address, hotel_name = row
+        distance = get_distance(town, hotel_name, address)
         conn.execute('UPDATE Results set distance = ? WHERE id = ?', (distance, id))
     conn.commit()
 
@@ -81,3 +81,9 @@ def hotel_with_best_score(conn):
                              LIMIT 1''')
     best_hotel = cursor.fetchone()[0]
     return best_hotel
+
+def ranking_all_hotels(conn):
+    cursor = conn.execute('''SELECT hotelName, rankingScore
+                             FROM Points
+                             ORDER BY rankingScore DESC''')
+    return cursor.fetchall()

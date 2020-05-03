@@ -23,13 +23,17 @@ class TestUtilsForDatbase(unittest.TestCase):
 
     def test_distance(self):
         address = normalize_string("22 Avenue Jean Janvier, 35000, Rennes France")
-        self.assertEqual(get_distance("Rennes", address), 3.2)
+        hotel_name = normalize_string('Novotel SPA Rennes Centre Gare')
+        self.assertEqual(get_distance("Rennes", hotel_name, address), 3.2)
         address = normalize_string('36 rue du Grenier Saint Lazare, 75003 Paris France')
-        self.assertEqual(get_distance('Paris', address), 2.6)
+        hotel_name = normalize_string('Hotel Georgette')
+        self.assertEqual(get_distance('Paris', hotel_name, address), 2.6)
         address = normalize_string('40 Rue de Saint-Quentin, 75010 Paris')
-        self.assertEqual(get_distance('Paris', address), 0.6)
-        address = normalize_string('Brit Hotel du Parc - Fougères, 5 Zone de La Pilais 35133 Lécousse FR, Lécousse')
-        self.assertEqual(get_distance('Romagné', address), 3.1)
+        hotel_name = normalize_string('New Hôtel Gare Du Nord')
+        self.assertEqual(get_distance('Paris', hotel_name, address), 0.6)
+        address = normalize_string('5 Zone de La Pilais 35133 Lécousse FR, Lécousse')
+        hotel_name = normalize_string('Brit Hotel du Parc - Fougères')
+        self.assertEqual(get_distance('Romagné', hotel_name, address), 3.1)
 
 
 class TestUtilsForPoints(unittest.TestCase):

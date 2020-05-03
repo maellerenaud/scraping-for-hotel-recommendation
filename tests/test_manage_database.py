@@ -42,13 +42,13 @@ class TestDatabase(unittest.TestCase):
     def test_fill_distances(self):
         conn = connection('Rennes', '2020-5-27', '2020-5-28')
         create_tables(conn)
-        save(conn, 'Hotel name 1', 'tripadvisor', 30, 0.85, 547, '1 rue Bahon Rault, Rennes', 2.5, True, False, True)
-        save(conn, 'Hotel name 2', 'trivago', 59.99, None, None, '1 rue Bahon Rault, Rennes', None, True, False, True)
+        save(conn, 'Garden Hôtel Rennes', 'tripadvisor', 30, 0.85, 547, '3 Rue Jean Marie Duhamel, 35000 Rennes', None, True, False, True)
+        save(conn, 'Hotel name 2', 'trivago', 59.99, None, None, '1 rue Bahon Rault, Rennes', 1, True, False, True)
         fill_distances(conn, 'Rennes')
         cursor = conn.execute("""SELECT * FROM Results""")
         rows = cursor.fetchall()
-        self.assertEqual(rows[0], (1, 'hotel name 1', 'tripadvisor', 30, 0.85, 547, '1 rue bahon rault rennes', 2.5, 1, 0, 1))
-        self.assertEqual(rows[1], (2, 'hotel name 2', 'trivago', 59.99, None, None, '1 rue bahon rault rennes', 2.5, 1, 0, 1))
+        self.assertEqual(rows[0], (1, 'garden hôtel rennes', 'tripadvisor', 30, 0.85, 547, '3 rue jean marie duhamel 35000 rennes', 2.9, 1, 0, 1))
+        self.assertEqual(rows[1], (2, 'hotel name 2', 'trivago', 59.99, None, None, '1 rue bahon rault rennes', 1, 1, 0, 1))
         conn.close()
         os.remove('./rennes-2020-5-27-2020-5-28.db')
 
