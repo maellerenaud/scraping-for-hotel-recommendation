@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from manage_database import *
 from tripadvisor import *
 
 
@@ -24,6 +23,7 @@ class GraphicalInterface(tk.Frame):
         self.arrival_date = tk.StringVar(value="2020-06-25")
         self.departure_date = tk.StringVar(value="2020-06-26")
         self.result_list = []
+        self.hotel_labels = []
 
     def init_window(self):
         self.window.geometry('480x150')
@@ -42,21 +42,6 @@ class GraphicalInterface(tk.Frame):
         # Button
         ttk.Button(self.window, text="Chercher", command=self.search_command).grid(row=4, column=0)
 
-    def display_results(self):
-        ttk.Label(self.window, text="Classement des hôtels disponibles").grid(row=5, columnspan=3)
-        nb_hotels = len(self.result_list)
-        for i in range(nb_hotels):
-            if i == 0:
-                text_color = 'red'
-            else:
-                text_color = 'black'
-            hotel_name, score = self.result_list[i]
-            ttk.Label(self.window, text=str(i+1), foreground=text_color).grid(row=6+i, column=0)
-            ttk.Label(self.window, text=hotel_name, foreground=text_color).grid(row=6+i, column=1)
-            ttk.Label(self.window, text="Score : " + str(score), foreground=text_color).grid(row=6+i, column=2)
-        window_height = 150 + 22 * nb_hotels
-        self.window.geometry('550x{}'.format(str(window_height)))
-
     def search_command(self):
         try :
             verify_date_format(self.arrival_date.get())
@@ -72,3 +57,49 @@ class GraphicalInterface(tk.Frame):
             messagebox.showerror("Erreur de date", "Les dates proposées sont passées.")
         except DateOrder:
             messagebox.showerror("Erreur de date", "La date de départ est antérieure à celle d'arrivée.")
+
+    def display_results(self):
+        ttk.Label(self.window, text="Classement des hôtels disponibles", font='-weight bold').grid(row=5, columnspan=3)
+        nb_hotels = len(self.result_list)
+        for i in range(nb_hotels):
+            if i == 0:
+                text_color = 'red'
+            else:
+                text_color = 'black'
+            hotel_name = self.result_list[i][0]
+            score = self.result_list[i][1]
+            ttk.Label(self.window, text=str(i+1), foreground=text_color).grid(row=6+i, column=0)
+            hotel_label = ttk.Label(self.window, text=hotel_name, foreground=text_color)
+            self.hotel_labels.append(hotel_label)
+            hotel_label.grid(row=6+i, column=1)
+            hotel_label.bind("<Button-1>", lambda event, hotel_rank=i: self.display_hotel_info(hotel_rank))
+            hotel_label.bind("<Enter>", lambda event, hotel_rank=i: self.color_enter(hotel_rank))
+            hotel_label.bind("<Leave>", lambda event, hotel_rank=i: self.color_leave(hotel_rank))
+            ttk.Label(self.window, text="Score : " + str(score), foreground=text_color).grid(row=6+i, column=2)
+        ttk.Label(self.window, text="Cliquez sur un hôtel pour obtenir plus d'informations.", font="-slant italic -size 10").grid(row=6+nb_hotels, columnspan=3)
+        window_height = 150 + 22 * (nb_hotels + 1)
+        self.window.geometry('550x{}'.format(str(window_height)))
+
+
+    def color_enter(self, hotel_rank):
+        label = self.hotel_labels[hotel_rank]
+        label.config(font="-weight bold")
+
+    def color_leave(self, hotel_rank):
+        label = self.hotel_labels[hotel_rank]
+        label.config(font='TkDefaultFont')
+
+    def display_hotel_info(self, hotel_rank):
+        '''hotel rank starts to 0, position of the hotel in the result_list'''
+        hotel_name, score, address, price, grade, distance, wifi, minibar, clim = self.result_list[hotel_rank]
+        info_window = tk.Toplevel(self.window)
+        info_window.title("Détails sur un hôtel")
+        ttk.Label(info_window, text="Nom de l'hôtel : {}".format(hotel_name)).pack(anchor='w')
+        ttk.Label(info_window, text="Score obtenu : {}".format(score)).pack(anchor='w')
+        ttk.Label(info_window, text="Adresse : {}".format(address)).pack(anchor='w')
+        ttk.Label(info_window, text="Prix : {} euros".format(price)).pack(anchor='w')
+        ttk.Label(info_window, text="Moyenne des avis : {} / 10".format(grade * 10)).pack(anchor='w')
+        ttk.Label(info_window, text="Distance au centre ville (ou à l'office de tourisme) : {} km".format(distance)).pack(anchor='w')
+        ttk.Label(info_window, text="Présence de wifi : {}".format('oui' if wifi else 'non')).pack(anchor='w')
+        ttk.Label(info_window, text="Présence d'un minibar : {}".format('oui' if minibar else 'non')).pack(anchor='w')
+        ttk.Label(info_window, text="Présence de climatisation : {}".format('oui' if clim else 'non')).pack(anchor='w')

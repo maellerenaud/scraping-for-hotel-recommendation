@@ -83,5 +83,21 @@ class TestDatabase(unittest.TestCase):
         conn.close()
         os.remove('./rennes-2020-5-27-2020-5-28.db')
 
+    def test_ranking_all_hotels(self):
+        conn = connection('Rennes', '2020-5-27', '2020-5-28')
+        create_tables(conn)
+        save(conn, 'Hotel name 1', 'tripadvisor', 30, 0.85, 547, '1 rue Bahon Rault, Rennes', 5, True, False, True)
+        save(conn, 'Hotel name 1', 'trivago', 59.99, None, None, '1 rue Baon ault, Rennes', 7, False, False, False)
+        save(conn, 'Hotel name 1', 'booking', 30, 0.6, 53, '1 rue Bahon Rault, Rennes', 3, True, False, False)
+        save(conn, 'Hotel name 2', 'trivago', 59.99, 0.7, 1234, '2 rue Bahon Rault, Rennes', 1.2, False, False, True)
+        save(conn, 'Hotel name 3', 'trivago', 80, 0.5, 1234, '3 rue Bahon Rault, Rennes', 3, False, False, False)
+        fill_points_table(conn)
+        self.assertEqual(ranking_all_hotels(conn),
+                         [('hotel name 1', 75, '1 rue bahon rault rennes', 30, 0.725, 3, True, False, True),
+                          ('hotel name 2', 62.78, '2 rue bahon rault rennes', 59.99, 0.7, 1.2, False, False, True),
+                          ('hotel name 3', 3, '3 rue bahon rault rennes', 80, 0.5, 3, False, False, False)])
+        conn.close()
+        os.remove('./rennes-2020-5-27-2020-5-28.db')
+
 if __name__ == '__main__':
     unittest.main()

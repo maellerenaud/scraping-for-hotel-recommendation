@@ -83,7 +83,9 @@ def hotel_with_best_score(conn):
     return best_hotel
 
 def ranking_all_hotels(conn):
-    cursor = conn.execute('''SELECT hotelName, rankingScore
-                             FROM Points
+    cursor = conn.execute('''SELECT Points.hotelName, rankingScore, MIN(address), MIN(price), AVG(grade), MIN(distance),
+                                CAST(MAX(CAST(wifi as INT)) AS BIT), CAST(MAX(CAST(minibar as INT)) AS BIT), CAST(MAX(CAST(clim as INT)) AS BIT)
+                             FROM Points JOIN Results ON Points.hotelName = Results.hotelName
+                             GROUP BY Points.hotelName
                              ORDER BY rankingScore DESC''')
     return cursor.fetchall()

@@ -19,7 +19,7 @@ class TestGraphicalInterface(unittest.TestCase):
 
     def test_display_window(self):
         interface = GraphicalInterface()
-        interface.result_list = [('super hotel', 75.25) for i in range(10)]
+        interface.result_list = [('super hotel '+str(i), 75.25, 'adresse', 115, 0.725, 3.2, True, False, False) for i in range(10)]
         interface.init_window()
         interface.display_results()
         interface.window.mainloop()
@@ -50,6 +50,13 @@ class TestGraphicalInterface(unittest.TestCase):
         interface.departure_date = tk.StringVar(value="2020-06-05")
         interface.init_window()
         interface.search_command()
+        interface.window.mainloop()
+
+    def test_display_hotel_info(self):
+        interface = GraphicalInterface()
+        interface.result_list = [('hotel name 1', 75, '1 rue bahon rault rennes', 30, 0.725, 3, True, False, True)]
+        interface.init_window()
+        interface.display_hotel_info(0)
         interface.window.mainloop()
 
 
