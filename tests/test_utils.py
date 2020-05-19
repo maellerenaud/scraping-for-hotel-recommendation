@@ -74,5 +74,29 @@ class TestUtilsForPoints(unittest.TestCase):
     def test_ranking_score(self):
         self.assertEqual(ranking_score(80, 50, 100, 8, 7, 9, 2, 0, 4, True, False, False), 50)
 
+
+class TestVerifyDates(unittest.TestCase):
+
+    def test_verify_date_format(self):
+        self.assertRaises(FormatError, verify_date_format, "20-05-03")
+        self.assertRaises(FormatError, verify_date_format, "2020-5-03")
+        self.assertRaises(FormatError, verify_date_format, "2020/05/03")
+        self.assertRaises(FormatError, verify_date_format, "2020-05-43")
+        self.assertRaises(FormatError, verify_date_format, "2020-25-03")
+        verify_date_format("2020-05-03")
+
+    def test_verify_not_past_date(self):
+        self.assertRaises(PastDateError, verify_not_past_date, "2020-03-05")
+        self.assertRaises(PastDateError, verify_not_past_date, "2019-06-05")
+        self.assertRaises(PastDateError, verify_not_past_date, "2020-05-05")
+        verify_not_past_date("2020-06-05")
+
+    def test_verify_date_order(self):
+        self.assertRaises(DateOrder, verify_date_order, "2020-06-05", "2020-06-04")
+        self.assertRaises(DateOrder, verify_date_order, "2020-06-05", "2020-05-06")
+        self.assertRaises(DateOrder, verify_date_order, "2020-06-05", "2019-06-06")
+        verify_date_order("2020-06-05", "2020-06-06")
+
+
 if __name__ == '__main__':
     unittest.main()

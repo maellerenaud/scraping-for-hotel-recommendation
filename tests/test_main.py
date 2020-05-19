@@ -24,8 +24,30 @@ class TestGraphicalInterface(unittest.TestCase):
         interface.display_results()
         interface.window.mainloop()
 
-    def test_search_command(self):
+    def test_search_command_without_error(self):
         interface = GraphicalInterface()
+        interface.init_window()
+        interface.search_command()
+        interface.window.mainloop()
+
+    def test_search_command_format_error(self):
+        interface = GraphicalInterface()
+        interface.arrival_date = tk.StringVar(value="2020/06/25")
+        interface.init_window()
+        interface.search_command()
+        interface.window.mainloop()
+
+    def test_search_command_past_date_error(self):
+        interface = GraphicalInterface()
+        interface.departure_date = tk.StringVar(value="2020-04-25")
+        interface.init_window()
+        interface.search_command()
+        interface.window.mainloop()
+
+    def test_search_command_past_date_error(self):
+        interface = GraphicalInterface()
+        interface.arrival_date = tk.StringVar(value="2020-06-06")
+        interface.departure_date = tk.StringVar(value="2020-06-05")
         interface.init_window()
         interface.search_command()
         interface.window.mainloop()

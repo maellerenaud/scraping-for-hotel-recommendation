@@ -2,6 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
+import re
+from datetime import date, datetime
 
 ### Set up browser
 
@@ -98,3 +100,34 @@ def ranking_score(price, price_min, price_max, grade, grade_min, grade_max, dist
     pts_distance = points_distance(distance, distance_min, distance_max)
     pts_services = points_wifi(wifi) + points_minibar(minibar) + points_clim(clim)
     return round(pts_price + pts_grade + pts_distance + pts_services, 2)
+
+### Verify dates
+
+class FormatError(Exception):
+    pass
+
+def verify_date_format(date):
+    wanted_format = r"[0-9]{4}-[0-1][0-9]-[0-3][0-9]"
+    if not re.match(wanted_format, date):
+        raise FormatError
+
+class PastDateError(Exception):
+    pass
+
+def verify_not_past_date(date_verified):
+    [year, month, day] = date_verified.split('-')
+    today = date.today()
+    today_year = today.strftime("%Y")
+    today_month = today.strftime("%m")
+    today_day = today.strftime("%d")
+    if year < today_year or (year == today_year and month < today_month) or (year == today_year and month == today_month and day < today_day):
+        raise PastDateError
+
+class DateOrder(Exception):
+    pass
+
+def verify_date_order(arrival_date, departure_date):
+    [arr_year, arr_month, arr_day] = arrival_date.split('-')
+    [dep_year, dep_month, dep_day] = departure_date.split('-')
+    if dep_year < arr_year or (dep_year == arr_year and dep_month < arr_month) or (dep_year == arr_year and dep_month == arr_month and dep_day < arr_day):
+        raise DateOrder

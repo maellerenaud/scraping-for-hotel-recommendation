@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from manage_database import *
 from tripadvisor import *
@@ -58,5 +58,17 @@ class GraphicalInterface(tk.Frame):
         self.window.geometry('550x{}'.format(str(window_height)))
 
     def search_command(self):
-        self.result_list = find_best_hotel(self.town.get(), self.arrival_date.get(), self.departure_date.get())
-        self.display_results()
+        try :
+            verify_date_format(self.arrival_date.get())
+            verify_date_format(self.departure_date.get())
+            verify_not_past_date(self.arrival_date.get())
+            verify_not_past_date(self.departure_date.get())
+            verify_date_order(self.arrival_date.get(), self.departure_date.get())
+            self.result_list = find_best_hotel(self.town.get(), self.arrival_date.get(), self.departure_date.get())
+            self.display_results()
+        except FormatError:
+            messagebox.showerror("Erreur de date", "Le format attendu est AAAA-MM-JJ.")
+        except PastDateError:
+            messagebox.showerror("Erreur de date", "Les dates proposées sont passées.")
+        except DateOrder:
+            messagebox.showerror("Erreur de date", "La date de départ est antérieure à celle d'arrivée.")
