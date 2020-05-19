@@ -5,6 +5,9 @@ import os
 import unittest
 from datetime import date
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
 #Get to the site
 option = webdriver.ChromeOptions()
@@ -16,6 +19,7 @@ browser.get('https://www.trivago.fr/')
 ### TTD
 
 class TestFunction(unittest.TestCase):
+    """
     def test_connexion_home_page(self):
         self.assertEqual(connexion_home_page(),"Essayez de rechercher une ville, un hôtel ou même un lieu connu.")
     
@@ -29,8 +33,36 @@ class TestFunction(unittest.TestCase):
     def test_get_research(self):
         hotel_test=get_research('Rennes','2021-01-01','2021-01-15') #array f hotelspossible
         self.assertEqual(hotel_test,'js_itemlist')
+    
+    
+    def test_get_information_hotel(self): #the test hotal has to be first in apparition order
+        browser.get('https://www.trivago.fr/?aDateRange%5Barr%5D=2021-01-01&aDateRange%5Bdep%5D=2021-01-15&aPriceRange%5Bfrom%5D=0&aPriceRange%5Bto%5D=0&iRoomType=9&aRooms%5B0%5D%5Badults%5D=2&aRooms%5B0%5D%5Bchildren%5D%5B0%5D=10&aRooms%5B0%5D%5Bchildren%5D%5B1%5D=10&cpt2=21766%2F200&hasList=1&hasMap=0&bIsSeoPage=0&sortingId=1&slideoutsPageItemId=&iGeoDistanceLimit=20000&address=&addressGeoCode=&offset=0&ra=&overlayMode=checkIn')
+        time.sleep(5)
+        list_hotels_prov1= browser.find_elements_by_tag_name("li")
+        hotel= list_hotels_prov1[5]
+                
+        information = get_information_hotel(hotel)
+        self.assertEqual(information,['Le Saint Antoine Hotel & Spa, BW Premier Collection','27 avenue Jean Janvier',524,'1.0',0.9,True,False,True]) 
+        #Nom,adresse,prix,distance,note,wifi,minibar,clim
+    """
+    def test_get_hotels(self):
+        hotels=get_hotels('Rennes','2021-01-01','2021-01-15')
+        self.assertGreater(len(hotels),100)
 
 ### Code
+
+def scroll():
+    SCROLL_PAUSE_TIME = 1.5
+    last_height = browser.execute_script("return document.body.scrollHeight")
+    while True:
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    
+        time.sleep(SCROLL_PAUSE_TIME)
+
+        new_height = browser.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
 
 def connexion_home_page():
     search_title= browser.find_element_by_xpath('//span[@class="hero__subtitle"]').text
@@ -47,22 +79,28 @@ def get_research(town,start_date,end_date):
     place_input.send_keys(town)
     place_input.send_keys(Keys.ENTER)
 
-    start_date_button = browser.find_element_by_xpath('//button[@class="dealform-button js-dealform-button-calendar dealform-button--checkin"]')
-    start_date_button.click()
+    try :
+        start_date_button = browser.find_element_by_xpath('//button[@class="dealform-button js-dealform-button-calendar dealform-button--checkin"]')
+        start_date_button.click()
+    except:
+        pass
+    time.sleep(2)
     click_date(start_date)
     
     try :
         end_date_button= browser.find_element_by_xpath('//button[@class="dealform-button js-dealform-button-calendar dealform-button--checkout"]')
-    except :
-        end_date_button= browser.find_element_by_xpath('//button[@class="dealform-button js-dealform-button-calendar dealform-button--checkout dealform-button--highlight"]')
-    end_date_button.click()
+        end_date_button.click()
+    except:
+        pass
     click_date(end_date)
 
     try: #version with no chambres
-        '''
-        family_button = browser.find_element_by_xpath('//button[@class=dealform-button dealform-button--guests js-dealform-button-guests"]')
-        family_button.click()
-        '''
+        try :
+            family_button = browser.find_element_by_xpath('//button[@class=dealform-button dealform-button--guests js-dealform-button-guests"]')
+            family_button.click()
+        except:
+            pass
+        
         children_input = browser.find_element_by_xpath('//div[@class="guest-selector__content clearfix"]/div[2]/div[1]/button[2]')
         children_input.click()
         children_input = browser.find_element_by_xpath('//div[@class="guest-selector__content clearfix"]/div[2]/div[1]/button[2]')
@@ -78,6 +116,7 @@ def get_research(town,start_date,end_date):
     except: #version with chambres
         type_room_button = browser.find_element_by_xpath('//ul[@class="df_container_roomtype_selector df_dropdown"]/li[3]/button')
         type_room_button.click()
+        time.sleep(1)
         children_button = browser.find_element_by_xpath('//div[@class="column childs clearfix"]/div/select/option[3]')
         children_button.click()
         for i in range (1,3):
@@ -97,9 +136,9 @@ def get_research(town,start_date,end_date):
 
 def click_date (go_to_date):
     dic_month={'Janvier':1,'Février':2,'Mars':3,'Avril':4,'Mai':5,'Juin':6,'Juillet':7,'Août':8,'Septembre':9,'Octobre':10,'Novembre':11,'Décembre':12}
-    
-    button_change_month = browser.find_element_by_xpath('//button[@class="cal-btn-next"]')
 
+    button_change_month = browser.find_element_by_xpath('//button[@class="cal-btn-next"]')
+    
     #Get to the correct page
     go_to_year=int(go_to_date[0:4])
     go_to_month=int(go_to_date[5:7])
@@ -121,7 +160,50 @@ def click_date (go_to_date):
     date_check= browser.find_element_by_xpath('//time[@class="dealform-button__label"]').get_attribute("datetime")
     return (date_check)
 
+def get_hotels(town,start_date,end_date):
+    get_research(town,start_date,end_date)
+    hotels_information=[]
+    for j in range (5):
+        time.sleep(2)
+        list_hotels_prov= browser.find_elements(By.XPATH, '//li[@class="hotel-item item-order__list-item js_co_item"]')
+        for i in list_hotels_prov:
+            hotels_information.append(get_information_hotel(i))
+            
+        
+        scroll()
+        if j<4:
+            button_next_page =  browser.find_element_by_xpath('//button[@class="btn btn--pagination btn--small btn--page-arrow btn--next"]')
+            button_next_page.click()
+    return (hotels_information)
 
+def get_information_hotel(hotel):
+    title= hotel.find_element_by_xpath('//span[@class="item-link name__copytext"]').get_attribute("title")
+    information_distance = hotel.find_element_by_xpath('//p[@class="details-paragraph details-paragraph--location location-details"]').text
+    distance = information_distance.split(' ')[2]
+    price = int((hotel.find_element_by_xpath('//strong[@data-qa="recommended-price"]').text)[0:-1])
+    note = float(hotel.find_element_by_xpath('//span[@class="item-components__pillValue--77580 item-components__value-sm--955cd item-components__pillValue--77580"]').text)/10
+    get_adress_button = hotel.find_element_by_xpath('//span[@class="icon-ic slideout-toggle-ic icon-contain"]')
+    get_adress_button.click()
+    time.sleep (5)
+    adress= hotel.find_element_by_xpath('//span[@itemprop="streetAddress"]').text
+    WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="link"]')))
+    time.sleep(2)
+    wifi= False
+    mini_bar= False
+    clim = False
+    liste_services = hotel.find_elements_by_xpath('//li[@class="unordered-list__item"]')
+    for i in liste_services :
+        if i.get_attribute("class")=='unordered-list__item':
+            if ('Wi-fi' in i.text) or ('Internet' in i.text):
+                wifi= True
+            elif i.text == "Climatisation":
+                clim= True
+            elif i.text == 'Réfrégirateur':
+                mini_bar== True
+    information = [title,adress,price,distance,note,wifi,mini_bar,clim] 
+    #Nom,adresse,prix,distance,note,wifi,minibar,clim
+    browser.execute_script("window.scrollTo(0,300)")
+    return (information)
 ### Test
 
 if __name__ == '__main__':
