@@ -166,10 +166,9 @@ def get_hotels(town,start_date,end_date):
     for j in range (5):
         time.sleep(2)
         list_hotels_prov= browser.find_elements(By.XPATH, '//li[@class="hotel-item item-order__list-item js_co_item"]')
+        time.sleep(10)
         for i in list_hotels_prov:
             hotels_information.append(get_information_hotel(i))
-            
-        
         scroll()
         if j<4:
             button_next_page =  browser.find_element_by_xpath('//button[@class="btn btn--pagination btn--small btn--page-arrow btn--next"]')
@@ -177,29 +176,43 @@ def get_hotels(town,start_date,end_date):
     return (hotels_information)
 
 def get_information_hotel(hotel):
+    time.sleep(2)
     title= hotel.find_element_by_xpath('//span[@class="item-link name__copytext"]').get_attribute("title")
     information_distance = hotel.find_element_by_xpath('//p[@class="details-paragraph details-paragraph--location location-details"]').text
     distance = information_distance.split(' ')[2]
     price = int((hotel.find_element_by_xpath('//strong[@data-qa="recommended-price"]').text)[0:-1])
-    note = float(hotel.find_element_by_xpath('//span[@class="item-components__pillValue--77580 item-components__value-sm--955cd item-components__pillValue--77580"]').text)/10
+    note = -1
+    try :
+        note = float(hotel.find_element_by_xpath('//span[@class="review"]/span/span').text)/10
+    except:
+        pass
+    time.sleep(2)
     get_adress_button = hotel.find_element_by_xpath('//span[@class="icon-ic slideout-toggle-ic icon-contain"]')
     get_adress_button.click()
+    print("Bouton cliqué")
     time.sleep (5)
-    adress= hotel.find_element_by_xpath('//span[@itemprop="streetAddress"]').text
-    WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="link"]')))
-    time.sleep(2)
+    adress = False
+    try:
+        adress= hotel.find_element_by_xpath('//span[@itemprop="streetAddress"]').text
+    except:
+        pass
     wifi= False
     mini_bar= False
     clim = False
-    liste_services = hotel.find_elements_by_xpath('//li[@class="unordered-list__item"]')
-    for i in liste_services :
-        if i.get_attribute("class")=='unordered-list__item':
-            if ('Wi-fi' in i.text) or ('Internet' in i.text):
-                wifi= True
-            elif i.text == "Climatisation":
-                clim= True
-            elif i.text == 'Réfrégirateur':
-                mini_bar== True
+    try :
+        WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="link"]')))
+        time.sleep(2) 
+        liste_services = hotel.find_elements_by_xpath('//li[@class="unordered-list__item"]')
+        for i in liste_services :
+            if i.get_attribute("class")=='unordered-list__item':
+                if ('Wi-fi' in i.text) or ('Internet' in i.text):
+                    wifi= True
+                elif i.text == "Climatisation":
+                    clim= True
+                elif i.text == 'Réfrégirateur':
+                    mini_bar== True
+    except:
+        pass
     information = [title,adress,price,distance,note,wifi,mini_bar,clim] 
     #Nom,adresse,prix,distance,note,wifi,minibar,clim
     browser.execute_script("window.scrollTo(0,300)")
