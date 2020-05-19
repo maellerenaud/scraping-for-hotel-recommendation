@@ -7,9 +7,10 @@ from tripadvisor import *
 def find_best_hotel(town, arrival_date, departure_date):
     conn = connection(town, arrival_date, departure_date)
     create_tables(conn)
-    browser = setup_browser(r"../chromedriver")
+    browser = setup_browser("./chromedriver")
     request(browser, town, arrival_date, departure_date)
     visit_hotels_all_pages(conn, browser)
+    browser.close()
     fill_distances(conn, town)
     fill_points_table(conn)
     return ranking_all_hotels(conn)
@@ -20,8 +21,8 @@ class GraphicalInterface(tk.Frame):
     def __init__(self):
         self.window = tk.Tk()
         self.town = tk.StringVar(value="Fougères")
-        self.arrival_date = tk.StringVar(value="2020-06-25")
-        self.departure_date = tk.StringVar(value="2020-06-26")
+        self.arrival_date = tk.StringVar(value="2020-06-23")
+        self.departure_date = tk.StringVar(value="2020-06-24")
         self.result_list = []
         self.hotel_labels = []
 
@@ -98,8 +99,12 @@ class GraphicalInterface(tk.Frame):
         ttk.Label(info_window, text="Score obtenu : {}".format(score)).pack(anchor='w')
         ttk.Label(info_window, text="Adresse : {}".format(address)).pack(anchor='w')
         ttk.Label(info_window, text="Prix : {} euros".format(price)).pack(anchor='w')
-        ttk.Label(info_window, text="Moyenne des avis : {} / 10".format(grade * 10)).pack(anchor='w')
+        ttk.Label(info_window, text="Moyenne des avis : {} / 10".format(round(grade, 2) * 10)).pack(anchor='w')
         ttk.Label(info_window, text="Distance au centre ville (ou à l'office de tourisme) : {} km".format(distance)).pack(anchor='w')
         ttk.Label(info_window, text="Présence de wifi : {}".format('oui' if wifi else 'non')).pack(anchor='w')
         ttk.Label(info_window, text="Présence d'un minibar : {}".format('oui' if minibar else 'non')).pack(anchor='w')
         ttk.Label(info_window, text="Présence de climatisation : {}".format('oui' if clim else 'non')).pack(anchor='w')
+
+interface = GraphicalInterface()
+interface.init_window()
+interface.window.mainloop()

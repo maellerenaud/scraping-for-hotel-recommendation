@@ -52,6 +52,7 @@ def get_distance(town, hotel_name, address):
     button_car.click()
     wait = WebDriverWait(browser, 10)
     distance = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@id="section-directions-trip-0"]/div[2]/div[1]/div[1]/div[2]/div[1]'))).text
+    browser.close()
     return convert_distance_string_into_float(distance)
 
 ### Attribute points to each criteria to get a ranking function on 100 points
