@@ -179,8 +179,8 @@ def visit_hotels_one_page(conn, browser):
     available_hotels = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@id="taplc_hsx_hotel_list_lite_dusty_hotels_combined_sponsored_0"]')))
     time.sleep(3)
     list_hotels = available_hotels.find_elements_by_xpath('.//a[@data-clicksource="HotelName"]')
-    nb_hotels = len(list_hotels) - 1
-    print(nb_hotels)
+    nb_hotels = len(list_hotels)
+    print("{} hôtels disponibles".format(nb_hotels))
     for i in range(nb_hotels):
         wait = WebDriverWait(browser, 10)
         list_hotels = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//a[@data-clicksource="HotelName"]')))

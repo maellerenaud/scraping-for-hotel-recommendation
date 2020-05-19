@@ -11,7 +11,6 @@ def setup_browser(path_chromedriver):
     option.add_argument("--start-maximised") #"kiosk" sur mac
     prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096 }
     option.add_experimental_option('prefs', prefs)
-    #browser = webdriver.Chrome(executable_path=str(os.getcwd())+"\chromedriver", options=option) #!!! Executable à télécharger et path à changer
     browser = webdriver.Chrome(executable_path=path_chromedriver, options=option)
     return browser
 
@@ -44,6 +43,7 @@ def get_distance(town, hotel_name, address):
     town_url = "{}+office+de+tourisme".format(town,)
     address_url = '+'.join(hotel_name.split(' ')) + '+' + '+'.join(address.split(' '))
     url = "https://www.google.fr/maps/dir/{}/{}/".format(address_url, town_url)
+    print(url)
     browser.get(url)
     wait = WebDriverWait(browser, 10)
     button_car = wait.until(ec.presence_of_element_located((By.XPATH, '//button/div[@aria-label="Voiture"]')))

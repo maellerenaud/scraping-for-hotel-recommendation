@@ -20,10 +20,10 @@ class GraphicalInterface(tk.Frame):
 
     def __init__(self):
         self.window = tk.Tk()
-        self.town = tk.StringVar()
-        self.arrival_date = tk.StringVar()
-        self.departure_date = tk.StringVar()
-        self.result_list = [('super hotel', 75.25) for i in range(10)]
+        self.town = tk.StringVar(value="Fougères")
+        self.arrival_date = tk.StringVar(value="2020-06-25")
+        self.departure_date = tk.StringVar(value="2020-06-26")
+        self.result_list = []
 
     def init_window(self):
         self.window.geometry('480x150')
@@ -55,14 +55,8 @@ class GraphicalInterface(tk.Frame):
             ttk.Label(self.window, text=hotel_name, foreground=text_color).grid(row=6+i, column=1)
             ttk.Label(self.window, text="Score : " + str(score), foreground=text_color).grid(row=6+i, column=2)
         window_height = 150 + 22 * nb_hotels
-        self.window.geometry('480x{}'.format(str(window_height)))
+        self.window.geometry('550x{}'.format(str(window_height)))
 
     def search_command(self):
-        self.result_list = find_best_hotel(str(self.town), str(self.arrival_date), str(self.departure_date))
+        self.result_list = find_best_hotel(self.town.get(), self.arrival_date.get(), self.departure_date.get())
         self.display_results()
-
-
-interface = GraphicalInterface()
-interface.init_window()
-interface.display_results()
-interface.window.mainloop()
