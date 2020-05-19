@@ -181,7 +181,7 @@ def get_information_hotel(hotel):
     information_distance = hotel.find_element_by_xpath('//p[@class="details-paragraph details-paragraph--location location-details"]').text
     distance = information_distance.split(' ')[2]
     price = int((hotel.find_element_by_xpath('//strong[@data-qa="recommended-price"]').text)[0:-1])
-    note = -1
+    note = -1 #default value
     try :
         note = float(hotel.find_element_by_xpath('//span[@class="review"]/span/span').text)/10
     except:
@@ -191,7 +191,7 @@ def get_information_hotel(hotel):
     get_adress_button.click()
     print("Bouton cliqué")
     time.sleep (5)
-    adress = False
+    adress = False #Default value
     try:
         adress= hotel.find_element_by_xpath('//span[@itemprop="streetAddress"]').text
     except:
