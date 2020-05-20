@@ -15,11 +15,12 @@ option.add_argument("--incognito")
 option.add_argument("--start-maximised")
 browser = webdriver.Chrome(executable_path="/home/muller/Documents/Formation_JCS/scraping/chromedriver", options=option)
 browser.get('https://www.trivago.fr/')
+browser.maximize_window()
 
 ### TTD
 
 class TestFunction(unittest.TestCase):
-    """
+    
     def test_connexion_home_page(self):
         self.assertEqual(connexion_home_page(),"Essayez de rechercher une ville, un hôtel ou même un lieu connu.")
     
@@ -44,7 +45,7 @@ class TestFunction(unittest.TestCase):
         information = get_information_hotel(hotel)
         self.assertEqual(information,['Le Saint Antoine Hotel & Spa, BW Premier Collection','27 avenue Jean Janvier',524,'1.0',0.9,True,False,True]) 
         #Nom,adresse,prix,distance,note,wifi,minibar,clim
-    """
+
     def test_get_hotels(self):
         hotels=get_hotels('Rennes','2021-01-01','2021-01-15')
         self.assertGreater(len(hotels),100)
@@ -78,7 +79,7 @@ def get_research(town,start_date,end_date):
     place_input.click()
     place_input.send_keys(town)
     place_input.send_keys(Keys.ENTER)
-
+    time.sleep(1)
     try :
         start_date_button = browser.find_element_by_xpath('//button[@class="dealform-button js-dealform-button-calendar dealform-button--checkin"]')
         start_date_button.click()
@@ -94,13 +95,14 @@ def get_research(town,start_date,end_date):
         pass
     click_date(end_date)
 
-    try: #version with no chambres
-        try :
-            family_button = browser.find_element_by_xpath('//button[@class=dealform-button dealform-button--guests js-dealform-button-guests"]')
-            family_button.click()
-        except:
-            pass
-        
+    
+    try :
+        family_button = browser.find_element_by_xpath('//button[@class="dealform-button dealform-button--guests js-dealform-button-guests"]')
+        family_button.click()
+    except:
+        pass
+
+    try: #version with no chambres    
         children_input = browser.find_element_by_xpath('//div[@class="guest-selector__content clearfix"]/div[2]/div[1]/button[2]')
         children_input.click()
         children_input = browser.find_element_by_xpath('//div[@class="guest-selector__content clearfix"]/div[2]/div[1]/button[2]')
@@ -136,7 +138,7 @@ def get_research(town,start_date,end_date):
 
 def click_date (go_to_date):
     dic_month={'Janvier':1,'Février':2,'Mars':3,'Avril':4,'Mai':5,'Juin':6,'Juillet':7,'Août':8,'Septembre':9,'Octobre':10,'Novembre':11,'Décembre':12}
-
+    time.sleep(1)
     button_change_month = browser.find_element_by_xpath('//button[@class="cal-btn-next"]')
     
     #Get to the correct page
@@ -154,8 +156,9 @@ def click_date (go_to_date):
         current_date= browser.find_element_by_xpath('//th[@class="cal-heading-month"]').text
         current_month= dic_month[str(current_date).split(' ')[0]]
         current_year= int(str(current_date).split(' ')[1])
-    
+    time.sleep(2)
     date= browser.find_element_by_xpath('//time[@datetime="'+go_to_date+'"]')
+    time.sleep(1)
     date.click()
     date_check= browser.find_element_by_xpath('//time[@class="dealform-button__label"]').get_attribute("datetime")
     return (date_check)
@@ -167,16 +170,23 @@ def get_hotels(town,start_date,end_date):
         time.sleep(2)
         list_hotels_prov= browser.find_elements(By.XPATH, '//li[@class="hotel-item item-order__list-item js_co_item"]')
         time.sleep(10)
-        for i in list_hotels_prov:
-            hotels_information.append(get_information_hotel(i))
+        hotels_information=[]
+        for i in range(len(list_hotels_prov)):
+            hotel_id=list_hotels_prov[i].get_attribute("id")
+            print(hotel_id)
+            hotels_information.append(get_information_hotel(hotel_id))
         scroll()
         if j<4:
-            button_next_page =  browser.find_element_by_xpath('//button[@class="btn btn--pagination btn--small btn--page-arrow btn--next"]')
-            button_next_page.click()
+            try:
+                button_next_page =  browser.find_element_by_xpath('//button[@class="btn btn--pagination btn--small btn--page-arrow btn--next"]')
+                button_next_page.click()
+            except:
+                break
     return (hotels_information)
 
-def get_information_hotel(hotel):
+def get_information_hotel(hotel_id):
     time.sleep(2)
+    hotel=browser.find_elements(By.XPATH, '//li[@id="'+hotel_id+'"]')[0]
     title= hotel.find_element_by_xpath('//span[@class="item-link name__copytext"]').get_attribute("title")
     information_distance = hotel.find_element_by_xpath('//p[@class="details-paragraph details-paragraph--location location-details"]').text
     distance = information_distance.split(' ')[2]
@@ -199,8 +209,14 @@ def get_information_hotel(hotel):
     wifi= False
     mini_bar= False
     clim = False
+    get_to_service_button= hotel.find_element_by_xpath('//h3[@class="m-0"]')
+    get_to_service_button.click()
+    browser.execute_script("window.scrollTo(0,750)")
+    wait = WebDriverWait(browser, 10)
+    service_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//h3[@class="btn btn--small btn--tertiary btn--icon-trailing slideouts__slideoutBtn--db423"]')))
+    service_button.click()
+    
     try :
-        WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="link"]')))
         time.sleep(2) 
         liste_services = hotel.find_elements_by_xpath('//li[@class="unordered-list__item"]')
         for i in liste_services :
@@ -213,11 +229,13 @@ def get_information_hotel(hotel):
                     mini_bar== True
     except:
         pass
-    information = [title,adress,price,distance,note,wifi,mini_bar,clim] 
-    #Nom,adresse,prix,distance,note,wifi,minibar,clim
+    close_button=hotel.find_element_by_xpath('//button[@class="btn--slideouts-close"]')
+    close_button.click()
+    information = [title,adress,price,distance,note,wifi,mini_bar,clim]  #Nom,adresse,prix,distance,note,wifi,minibar,clim
     browser.execute_script("window.scrollTo(0,300)")
     return (information)
 ### Test
 
 if __name__ == '__main__':
     unittest.main()
+

@@ -7,7 +7,8 @@ from tripadvisor import *
 def find_best_hotel(town, arrival_date, departure_date):
     conn = connection(town, arrival_date, departure_date)
     create_tables(conn)
-    browser = setup_browser("./chromedriver")
+    browser = setup_browser("/home/muller/Documents/Formation_JCS/scraping") #Path chromedriver for Alexandre
+    #browser = setup_browser("./chromedriver")
     request(browser, town, arrival_date, departure_date)
     visit_hotels_all_pages(conn, browser)
     browser.close()
@@ -105,6 +106,6 @@ class GraphicalInterface(tk.Frame):
         ttk.Label(info_window, text="Présence d'un minibar : {}".format('oui' if minibar else 'non')).pack(anchor='w')
         ttk.Label(info_window, text="Présence de climatisation : {}".format('oui' if clim else 'non')).pack(anchor='w')
 
-#interface = GraphicalInterface()
-#interface.init_window()
-#interface.window.mainloop()
+interface = GraphicalInterface()
+interface.init_window()
+interface.window.mainloop()

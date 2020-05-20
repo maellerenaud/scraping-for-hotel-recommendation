@@ -41,7 +41,8 @@ def convert_distance_string_into_float(string):
     return distance
 
 def get_distance(town, hotel_name, address):
-    browser = setup_browser(r"./chromedriver")
+    browser = setup_browser(r"/home/muller/Documents/Formation_JCS/scraping") #Path chromedriver for Alexandre
+    #browser = setup_browser(r"./chromedriver")
     town_url = "{}+office+de+tourisme".format(town,)
     address_url = '+'.join(hotel_name.split(' ')) + '+' + '+'.join(address.split(' '))
     url = "https://www.google.fr/maps/dir/{}/{}/".format(address_url, town_url)
