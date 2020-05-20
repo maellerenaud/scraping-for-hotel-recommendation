@@ -45,7 +45,6 @@ class TestFunction(unittest.TestCase):
         information = get_information_hotel(hotel)
         self.assertEqual(information,['Le Saint Antoine Hotel & Spa, BW Premier Collection','27 avenue Jean Janvier',524,'1.0',0.9,True,False,True]) 
         #Nom,adresse,prix,distance,note,wifi,minibar,clim
-
     def test_get_hotels(self):
         hotels=get_hotels('Rennes','2021-01-01','2021-01-15')
         self.assertGreater(len(hotels),100)
@@ -238,4 +237,3 @@ def get_information_hotel(hotel_id):
 
 if __name__ == '__main__':
     unittest.main()
-
