@@ -12,10 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 #Get to the site
 option = webdriver.ChromeOptions()
 option.add_argument("--incognito")
-option.add_argument("--start-maximised")
 browser = webdriver.Chrome(executable_path="/home/muller/Documents/Formation_JCS/scraping/chromedriver", options=option)
 browser.get('https://www.trivago.fr/')
-browser.maximize_window()
 
 ### TTD
 
@@ -164,14 +162,13 @@ def click_date (go_to_date):
 
 def get_hotels(town,start_date,end_date):
     get_research(town,start_date,end_date)
-    hotels_information=[]
     for j in range (5):
         time.sleep(2)
         list_hotels_prov= browser.find_elements(By.XPATH, '//li[@class="hotel-item item-order__list-item js_co_item"]')
-        time.sleep(10)
+        time.sleep(3)
         hotels_information=[]
         for i in range(len(list_hotels_prov)):
-            hotel_id=list_hotels_prov[i].get_attribute("id")
+            hotel_id= browser.find_elements(By.XPATH, '//li[@class="hotel-item item-order__list-item js_co_item"]')[i].get_attribute("id")
             print(hotel_id)
             hotels_information.append(get_information_hotel(hotel_id))
         scroll()
@@ -208,11 +205,8 @@ def get_information_hotel(hotel_id):
     wifi= False
     mini_bar= False
     clim = False
-    get_to_service_button= hotel.find_element_by_xpath('//h3[@class="m-0"]')
-    get_to_service_button.click()
-    browser.execute_script("window.scrollTo(0,750)")
     wait = WebDriverWait(browser, 10)
-    service_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//h3[@class="btn btn--small btn--tertiary btn--icon-trailing slideouts__slideoutBtn--db423"]')))
+    service_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//div[@class="expand-amenities"]/button')))
     service_button.click()
     
     try :
@@ -234,6 +228,10 @@ def get_information_hotel(hotel_id):
     browser.execute_script("window.scrollTo(0,300)")
     return (information)
 ### Test
-
+"""
 if __name__ == '__main__':
     unittest.main()
+"""
+
+infos=get_hotels('Fougères',"2020-06-15","2020-06-17")
+print(infos)
