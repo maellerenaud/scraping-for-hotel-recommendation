@@ -18,11 +18,8 @@ class TestSelenium(unittest.TestCase):
 
     def test_request(self):
         browser = setup_browser(r"../chromedriver")
-        request(browser, 'Rennes', '2020-5-27', '2020-5-29')
+        request(browser, 'Rennes', '2020-7-27', '2020-7-29')
         self.assertEqual(browser.current_url, "https://www.tripadvisor.fr/Hotels-g187103-Rennes_Ille_et_Vilaine_Brittany-Hotels.html")
-        browser = setup_browser(r"../chromedriver")
-        request(browser, 'Nantes', '2020-5-29', '2020-6-2')
-        self.assertEqual(browser.current_url, "https://www.tripadvisor.fr/Hotels-g187198-Nantes_Loire_Atlantique_Pays_de_la_Loire-Hotels.html")
 
     def test_visit_hotels_one_page(self):
         browser = setup_browser(r"../chromedriver")

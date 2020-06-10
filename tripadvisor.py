@@ -1,7 +1,9 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.action_chains import ActionChains
 import time
+from selenium.webdriver.common.keys import Keys
 from datetime import date
 
 from manage_database import *
@@ -14,9 +16,15 @@ def adapt_dates_to_tripadvisor(date):
     list[1] = str(int(list[1]) - 1)
     return '-'.join(list)
 
-def chose_town(search_bar, town):
-    picker_town = search_bar.find_element_by_xpath('./div[1]/div[1]/span[1]/input[1]')
+def chose_town(browser, town):
+    picker_town = browser.find_element_by_xpath('''//input[@placeholder="Destination ou nom d'hôtel"]''')
     picker_town.send_keys(town)
+    # ac = ActionChains(browser)
+    # ac.move_to_element(picker_town).move_by_offset(200, 200).click().perform()
+    wait = WebDriverWait(browser, 10)
+    first_result = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@data-test-attribute="typeahead-results"]/a[1]')))
+    link = first_result.get_attribute('href')
+    browser.get(link)
 
 def month_difference(date1, date2):
     list1 = date1.split('-')
@@ -29,8 +37,9 @@ def chose_date(browser, date):
     button_date = wait.until(ec.visibility_of_element_located((By.XPATH, '//span[@data-date="{}"]'.format(adapted_date,))))
     button_date.click()
 
-def chose_both_dates(browser, search_bar, arrival_date, departure_date):
-    open_calendar = search_bar.find_element_by_xpath('//span[@data-datetype="CHECKIN"]')
+def chose_both_dates(browser, arrival_date, departure_date):
+    wait = WebDriverWait(browser, 10)
+    open_calendar = wait.until(ec.visibility_of_element_located((By.XPATH, '//span[@data-datetype="CHECKIN"]')))
     open_calendar.click()
     time.sleep(1)
     today = str(date.today())
@@ -60,11 +69,12 @@ def request(browser, town, arrival_date, departure_date):
     browser.get('https://www.tripadvisor.fr/Hotels')
     wait = WebDriverWait(browser, 3)
     search_bar = wait.until(ec.presence_of_element_located((By.XPATH, '//div[@id="taplc_trip_search_home_hotels_0"]/div[2]')))
-    chose_town(search_bar, town)
-    chose_both_dates(browser, search_bar, arrival_date, departure_date)
+    chose_both_dates(browser, arrival_date, departure_date)
     chose_guests(browser, search_bar)
-    search_button = browser.find_element_by_xpath('//button[@id="SUBMIT_HOTELS"]')
-    search_button.click()
+    chose_town(browser, town)
+    # wait = WebDriverWait(browser, 3)
+    # search_button = wait.until(ec.presence_of_element_located((By.XPATH, '//button[@id="SUBMIT_HOTELS"]')))
+    # search_button.click()
 
 ### Get charateristics of one hotel
 
