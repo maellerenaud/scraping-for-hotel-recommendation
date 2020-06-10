@@ -17,9 +17,9 @@ class TestGraphicalInterface(unittest.TestCase):
         interface.init_window()
         interface.window.mainloop()
 
-    def test_display_window(self):
+    def test_display_results(self):
         interface = GraphicalInterface()
-        interface.result_list = [('super hotel '+str(i), 75.25, 'adresse', 115, 0.725, 3.2, True, False, False) for i in range(10)]
+        interface.result_list = [('super hotel ' + str(i), 75.25, 'adresse', 115, 0.725, 3.2, True, False, False) for i in range(10)]
         interface.init_window()
         interface.display_results()
         interface.window.mainloop()
