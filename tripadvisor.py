@@ -25,6 +25,7 @@ def chose_town(browser, town):
     first_result = wait.until(ec.visibility_of_element_located((By.XPATH, '//div[@data-test-attribute="typeahead-results"]/a[1]')))
     link = first_result.get_attribute('href')
     browser.get(link)
+    time.sleep(12)
 
 def month_difference(date1, date2):
     list1 = date1.split('-')

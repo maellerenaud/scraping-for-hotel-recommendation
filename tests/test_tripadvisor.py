@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from tripadvisor import *
 
@@ -22,17 +23,26 @@ class TestSelenium(unittest.TestCase):
         self.assertEqual(browser.current_url, "https://www.tripadvisor.fr/Hotels-g187103-Rennes_Ille_et_Vilaine_Brittany-Hotels.html")
 
     def test_visit_hotels_one_page(self):
+        conn = connection('Rennes', '2020-7-27', '2020-7-28')
         browser = setup_browser(r"../chromedriver")
-        request(browser, 'Rennes', '2020-5-27', '2020-5-28')
-        self.assertEqual(visit_hotels_one_page(browser), 11)
+        request(browser, 'Rennes', '2020-7-27', '2020-7-28')
+        self.assertEqual(visit_hotels_one_page(conn, browser), 11)
+        conn.close()
+        os.remove('./rennes-2020-7-27-2020-7-28.db')
 
     def test_visit_hotels_all_pages(self):
+        conn = connection('Rennes', '2020-7-27', '2020-7-28')
         browser = setup_browser(r"../chromedriver")
-        request(browser, 'Rennes', '2020-5-27', '2020-5-28')
-        self.assertEqual(visit_hotels_all_pages(browser), 11)
+        request(browser, 'Rennes', '2020-7-27', '2020-7-28')
+        self.assertEqual(visit_hotels_all_pages(conn, browser), 11)
+        conn.close()
+        os.remove('./rennes-2020-7-27-2020-7-28.db')
+        conn = connection('Toulouse', '2020-7-25', '2020-7-26')
         browser = setup_browser(r"../chromedriver")
-        request(browser, 'Toulouse', '2020-5-25', '2020-5-26')
-        self.assertEqual(visit_hotels_all_pages(browser), 61)
+        request(browser, 'Toulouse', '2020-7-25', '2020-7-26')
+        self.assertEqual(visit_hotels_all_pages(conn, browser), 61)
+        conn.close()
+        os.remove('./toulouse-2020-7-25-2020-7-26.db')
 
 
 class TestGetCharacteristics(unittest.TestCase):
@@ -44,7 +54,7 @@ class TestGetCharacteristics(unittest.TestCase):
 
     def test_get_price(self):
         browser = setup_browser(r"../chromedriver")
-        request(browser, 'Rennes', '2020-5-27', '2020-5-28')
+        request(browser, 'Rennes', '2020-7-27', '2020-7-28')
         browser.get('https://www.tripadvisor.fr/Hotel_Review-g187103-d2064905-Reviews-Novotel_SPA_Rennes_Centre_Gare-Rennes_Ille_et_Vilaine_Brittany.html')
         time.sleep(1)
         self.assertEqual(get_price(browser), 176)
@@ -95,11 +105,13 @@ class TestGetCharacteristics(unittest.TestCase):
         self.assertEqual(get_services(browser), (True, True, True))
 
     def test_get_all_characteristics(self):
+        conn = connection('Rennes', '2020-7-27', '2020-7-28')
         browser = setup_browser(r"../chromedriver")
-        request(browser, 'Rennes', '2020-5-27', '2020-5-28')
+        request(browser, 'Rennes', '2020-7-27', '2020-7-28')
         browser.get('https://www.tripadvisor.fr/Hotel_Review-g187103-d2064905-Reviews-Novotel_SPA_Rennes_Centre_Gare-Rennes_Ille_et_Vilaine_Brittany.html')
-        self.assertEqual(get_all_characteristics(browser), ("Novotel SPA Rennes Centre Gare", 176, 4717/5745, 1149, "22 Avenue Jean Janvier, 35000, Rennes France", True, True, True))
-
+        self.assertEqual(get_all_characteristics(conn, browser), ("Novotel SPA Rennes Centre Gare", 176, 4717/5745, 1149, "22 Avenue Jean Janvier, 35000, Rennes France", True, True, True))
+        conn.close()
+        os.remove('./rennes-2020-7-27-2020-7-268.db')
 
 
 if __name__ == '__main__':
